@@ -1,35 +1,25 @@
 -cp src
--dce full
 -lib electron
 -dce full
 -debug
+#--no-traces
+#-D release
 --each
 
 --next
 -js bin/main.js
 -main haarp.Main
-#-lib om.net
--cmd cp res/electron/package.json bin/
-
-#-cmd mkdir -p bin/image
-#-cmd mkdir -p bin/sound
-#-cmd mkdir -p bin/video
-#-cmd cp res/sound/*.wav bin/sound/
-#-cmd cp res/image/* bin/image/
-#-cmd cp res/video/*.mp4 bin/video/
-
-#--next
-#-js bin/controller.js
-#-main haarp.host.ControlWindow
-#-cmd cp res/html/controller.html bin/
-#-cmd lessc res/style/controller.less bin/controller.css
+-lib om.cli
 
 --next
--js bin/render.js
--main haarp.Render
+-js bin/app.js
+-main haarp.App
 -lib om.app
-#-lib om.three
+-lib om.activity
 -lib om.audio
--cmd cp res/html/render.html bin/
-#-cmd cp -r res/script/ bin/
--cmd lessc res/style/render.less bin/render.css
+-lib om.input
+-lib om.net
+-lib om.three
+-D app_name=haarp
+-D app_version=0.1.0
+-D web
