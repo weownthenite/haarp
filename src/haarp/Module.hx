@@ -41,6 +41,9 @@ class Module {
     function update() {
     }
 
+    function render() {
+    }
+
     function stop() {
     }
 

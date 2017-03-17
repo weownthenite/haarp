@@ -3,10 +3,7 @@ package haarp.app;
 import js.Browser.console;
 import js.Browser.document;
 import js.Browser.window;
-import js.html.CanvasElement;
-import js.html.CanvasRenderingContext2D;
-
-import haarp.module.*;
+import js.html.KeyboardEvent;
 
 class VisionActivity extends om.Activity {
 
@@ -25,7 +22,7 @@ class VisionActivity extends om.Activity {
 
     override function onCreate() {
         super.onCreate();
-        element.appendChild( vision.canvas );
+        element.appendChild( vision.display.canvas );
     }
 
     override function onStart() {
@@ -34,30 +31,75 @@ class VisionActivity extends om.Activity {
 
         console.group( 'start' );
 
-        vision.start();
+        startVision();
 
         animationFrameId = window.requestAnimationFrame( update );
+
+        window.addEventListener( 'resize', handleWindowResize, false );
+        window.addEventListener( 'keydown', handleKeyDown, false );
     }
 
     override function onStop() {
 
         super.onStop();
 
-        vision.stop();
+        console.groupEnd( 'stop' );
 
-        console.group( 'stop' );
-        console.groupEnd();
+        stopVision();
 
         window.cancelAnimationFrame( animationFrameId );
         animationFrameId = null;
+
+        window.removeEventListener( 'resize', handleWindowResize );
+        window.removeEventListener( 'keydown', handleKeyDown );
+    }
+
+    function startVision() {
+        trace("startVision");
+        //animationFrameId = window.requestAnimationFrame( update );
+        vision.start();
+    }
+
+    function stopVision() {
+        trace("stopVision");
+        //window.cancelAnimationFrame( animationFrameId );
+        //animationFrameId = null;
+        vision.stop();
     }
 
     function update( time : Float ) {
 
         animationFrameId = window.requestAnimationFrame( update );
-        vision.update();
 
-        //trace(time);
+        /*
+        var gamepads = js.Browser.navigator.getGamepads();
+        for( gamepad in gamepads ) {
+            if( gamepad != null ) {
+                /*
+                if( gamepad.buttons[0].pressed ) {
+                    vision.started ? stopVision() : startVision();
+                }
+            }
+        }
+        */
+
+        if( vision.started ) {
+            vision.update();
+            vision.render();
+        }
+    }
+
+    function handleWindowResize(e) {
+        vision.display.setSize( window.innerWidth, window.innerHeight );
+    }
+
+    function handleKeyDown( e : KeyboardEvent ) {
+        //trace(e.keyCode);
+        switch e.keyCode {
+        case 13:
+        case 32:
+            vision.started ? stopVision() : startVision();
+        }
     }
 
 }

@@ -3,7 +3,6 @@ package haarp.module;
 import js.Browser.document;
 import js.Browser.window;
 import js.html.ImageBitmap;
-import js.html.ImageElement;
 import js.html.CanvasRenderingContext2D;
 import js.node.Buffer;
 import js.node.Fs;
@@ -13,7 +12,6 @@ class Drzllect extends Module {
 
     var path : String;
     var images : Array<ImageBitmap>;
-    //var images : Array<ImageElement>;
     var ctx : CanvasRenderingContext2D;
     var index = 0;
 
@@ -27,7 +25,7 @@ class Drzllect extends Module {
 
         super.init();
 
-        ctx = vision.canvas.getContext2d();
+        ctx = vision.display.getContext2d();
         ctx.imageSmoothingEnabled = false;
 
         Fs.readdir( path, function(e,files) {
@@ -74,7 +72,7 @@ class Drzllect extends Module {
         } );
     }
 
-    override function update() {
+    override function render() {
 
         if( !enabled )
             return;
@@ -82,7 +80,7 @@ class Drzllect extends Module {
         var img = images[index];
 
         ctx.save();
-        ctx.scale( vision.canvas.width / img.width, vision.canvas.height / img.height );
+        ctx.scale( vision.display.width / img.width, vision.display.height / img.height );
         ctx.drawImage( images[index], 0, 0 );
         ctx.restore();
 

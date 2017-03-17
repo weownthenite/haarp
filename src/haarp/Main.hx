@@ -7,17 +7,8 @@ import electron.main.IpcMain;
 import electron.main.WebContents;
 import Sys.println;
 
-@cli({
-    description: 'Mind bender',
-    help: true
-})
-class Main implements om.CLI {
+class Main {
 
-    @cli({
-        name:  'vision',
-        description: 'Set the vision to load',
-        required: true
-    })
     static function start( vision : String ) {
 
         println( '\033c\n  H  A  A  R  P   -   '+vision.toUpperCase() );
@@ -25,7 +16,7 @@ class Main implements om.CLI {
         var win = new BrowserWindow( {
             show: false,
             center: true,
-            frame: #if debug true #else false #end,
+            frame: false, //#if debug true #else false #end,
             backgroundColor: '#000',
             webPreferences: {
                 backgroundThrottling: false,
@@ -57,7 +48,7 @@ class Main implements om.CLI {
             });
             */
         });
-        win.loadURL( 'file://' + Node.__dirname + '/app.html' );
+        win.loadURL( 'file://' + Node.__dirname + '/app.html?'+vision );
     }
 
     static function quit( ?info : String ) {
@@ -73,11 +64,13 @@ class Main implements om.CLI {
     static function main() {
 
         electron.main.App.on( 'ready', function(e) {
-
             var args = Sys.args();
+            if( args.length == 0 )
+                exit( 'Wat?' );
             var i = 0;
             while( i < args.length ) {
                 var opt = args[i];
+                trace(opt);
                 switch opt {
                 case '-help':
                     exit( 'Help yourself' );
@@ -86,7 +79,7 @@ class Main implements om.CLI {
                 case '-vision':
                     var vision = args[i+1];
                     if( vision == null )
-                        exit( 'Missing vision to load', -1 );
+                        exit( 'No vision given', -1 );
                     //untyped electron.main.App.commandLine.appendSwitch( 'enable-web-bluetooth', true );
                     electron.main.Menu.setApplicationMenu( null );
                     start( vision );

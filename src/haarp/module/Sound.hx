@@ -9,36 +9,58 @@ import om.audio.AudioBufferLoader;
 class Sound extends Module {
 
     public var url(default,null) : String;
-    public var source(default,null) : AudioBufferSourceNode;
+    public var loop : Bool;
 
-    public function new( url : String ) {
+    var buf : AudioBuffer;
+    var source : AudioBufferSourceNode;
+
+    public function new( url : String, loop = false ) {
         super();
         this.url = url;
+        this.loop = loop;
     }
 
     override function init( ?callback : Void->Void ) {
-
-        var audio = vision.sound.context;
-
-        AudioBufferLoader.loadAudioBuffer( audio, url ).then( function(buf){
-
-            source = audio.createBufferSource();
-            source.buffer = buf;
-            vision.sound.connect( source );
-
+        load( url, function( buf ) {
+            this.buf = buf;
+            //createSourceNode();
             callback();
-        });
+        } );
     }
 
     override function start() {
+        source = vision.sound.context.createBufferSource();
+        source.onended = function() if( loop ) start();
+        source.buffer = buf;
         source.start();
+        vision.sound.connect( source );
     }
 
     override function stop() {
-        source.stop();
+        if( source != null ) {
+            source.onended = null;
+            source.stop();
+            source = null;
+        }
     }
 
-    override function update() {
+    public function load( url : String, callback : AudioBuffer->Void ) {
+        if( source != null ) source.stop();
+        vision.sound.load( url, callback );
     }
+
+    /*
+    function createSourceNode() {
+        source = vision.sound.context.createBufferSource();
+        source.buffer = buf;
+        source.onended = function(){
+            if( loop ) {
+                createSourceNode();
+                start();
+            }
+        }
+        vision.sound.connect( source );
+    }
+    */
 
 }

@@ -9,7 +9,6 @@
 --next
 -js bin/main.js
 -main haarp.Main
--lib om.cli
 
 --next
 -js bin/app.js

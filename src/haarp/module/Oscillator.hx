@@ -3,28 +3,32 @@ package haarp.module;
 import js.html.CanvasRenderingContext2D;
 
 class Oscillator extends Module {
-    
+
+    public var color : String;
+
     var context : CanvasRenderingContext2D;
 
-    public function new() {
+    public function new( color = '#fff', lineWidth = 1 ) {
         super();
+        this.color = color;
     }
 
     override function init( ?callback : Void->Void ) {
-        context = vision.canvas.getContext2d();
-        context.strokeStyle = '#fff';
-        context.fillStyle = '#fff';
-        context.lineWidth = 1;
+        context = vision.display.canvas.getContext2d();
+        //context.strokeStyle = '#fff';
+        //context.fillStyle = '#fff';
         callback();
     }
 
-    override function update() {
+    override function render() {
 
-        var canvas = vision.canvas;
+        var canvas = vision.display.canvas;
         var w = canvas.width;
         var h = canvas.height;
 
-        context.fillStyle = '#fff';
+        context.lineWidth = 1;
+        context.strokeStyle = color;
+        //context.fillStyle = '#fff';
 
         var data = vision.sound.timeDomainData;
         var sw = canvas.width * 1 / data.length;
@@ -53,5 +57,6 @@ class Oscillator extends Module {
         context.stroke();
         */
     }
+
 
 }
