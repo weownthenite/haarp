@@ -2,7 +2,7 @@ package haarp.module;
 
 import js.html.CanvasRenderingContext2D;
 
-class Oscillator extends Module {
+class SoundSpectrum extends Module {
 
     public var color : String;
 
