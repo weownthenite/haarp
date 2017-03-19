@@ -1,10 +1,13 @@
 package haarp.module;
 
 import js.Browser.console;
+import js.Browser.document;
 import js.node.Buffer;
 import js.node.Net;
 import js.node.net.Server;
 import js.node.net.Socket;
+import js.html.CanvasElement;
+import js.html.CanvasRenderingContext2D;
 import js.html.rtc.IceCandidate;
 import js.html.rtc.PeerConnection;
 import js.html.rtc.SessionDescription;
@@ -14,54 +17,136 @@ import haxe.Json;
 private class Client {
 
     public dynamic function onDisconnect() {}
-    public dynamic function onMessage( msg : Dynamic ) {}
 
     var socket : Socket;
     var handshaked : Bool;
+    var peer : PeerConnection;
+    var canvas : CanvasElement;
+    var context : CanvasRenderingContext2D;
 
     public function new( socket : Socket ) {
+
         this.socket = socket;
+
         handshaked = false;
+
+        socket.once( 'close', function(e) {
+            trace( e );
+            //socket.removeListener( 'data', handleData );
+            onDisconnect();
+        });
         socket.once( 'data', function( buf : Buffer ) {
             socket.write( WebSocket.createHandshake( buf ) );
             handshaked = true;
             socket.addListener( 'data', handleData );
-        } );
-    }
+        });
 
-    public function sendString( str : String ) {
-        try socket.write( WebSocket.writeFrame( new Buffer( str ) ) ) catch(e:Dynamic) {
-            trace(e);
-        }
-    }
+        canvas = document.createCanvasElement();
+        canvas.style.position = 'fixed';
+        canvas.style.zIndex = '-1';
+        document.body.appendChild( canvas );
 
-    public inline function sendMessage( msg : Dynamic ) {
-        sendString( Json.stringify( msg )  );
+        context = canvas.getContext2d();
+        context.fillStyle = '#0000ff';
+        context.font = '100px Noto Sans';
     }
 
     function handleData( buf : Buffer ) {
-        var data = WebSocket.readFrame( buf );
-        if( data == null ) {
-            console.warn( 'Failed to read websocket frame\n'+buf[0] );
-        } else {
-            var msg = try Json.parse( data.toString() ) catch(e:Dynamic) {
+
+        var msg : Dynamic;
+        try {
+            var data = WebSocket.readFrame( buf );
+            if( data == null ) {
+                trace('??? data == null');
+                return;
+            }
+            msg = try Json.parse( data.toString() ) catch(e:Dynamic) {
                 console.error( e );
                 return;
             }
-            onMessage( msg );
+        } catch(e:Dynamic) {
+            console.error( 'failed to read websocket frame\n'+buf[0] );
+            return;
+        }
+
+        switch msg.type {
+
+        case "init":
+
+            peer = untyped __js__( 'new webkitRTCPeerConnection({iceServers:[]})' );
+            peer.onicecandidate = function(e) {
+                if( e.candidate == null ) {
+                    sendMessage( { type: 'init', sdp: peer.localDescription } );
+                }
+            }
+
+            canvas.width = msg.size.width;
+            canvas.height = msg.size.height;
+
+            var stream = untyped canvas.captureStream();
+            //peer.addTrack( stream );
+            peer.addStream( stream );
+
+            var channel = peer.createDataChannel( "channel-1" );
+            channel.onopen = function(e) {
+                trace(e);
+                channel.send( 'ping' );
+            }
+            channel.onmessage = function(e) {
+                trace(e);
+                //Timer.delay( function() sendChannel.send( 'ping' ), 1000 );
+            }
+            channel.onclose = function(e) trace(e);
+
+            peer.createOffer( { offerToReceiveAudio: 0,	offerToReceiveVideo: 1 } )
+                .then( function(desc) peer.setLocalDescription( desc ) )
+                .then( function(_) {
+                    //trace("...............");
+                    //sendMessage( { type: 'init', sdp: peer.localDescription } );
+                });
+
+        case 'sdp':
+            peer.setRemoteDescription( new SessionDescription( msg.sdp ) ).then( function(e){
+                console.log( 'HMD connected' );
+                //socket.end();
+            });
+        }
+    }
+
+    public inline function sendMessage( msg : Dynamic )
+        sendString( Json.stringify( msg )  );
+
+    public function sendString( str : String ) {
+        try socket.write( WebSocket.writeFrame( new Buffer( str ) ) ) catch(e:Dynamic) {
+            console.error(e);
+        }
+    }
+
+    public function render( src : CanvasElement ) {
+        context.clearRect( 0, 0, canvas.width, canvas.height );
+        context.drawImage( src, 0, 0 );
+        //context.fillRect( 0, 0, 200, 100 );
+    }
+
+    public function disconnect() {
+        if( peer != null ) {
+            peer.close();
+        }
+        if( socket != null ) {
+            socket.end();
         }
     }
 }
 
-class HMDHost extends Module {
+class HMDHost extends AbstractModule {
 
     public var ip(default,null) : String;
     public var port(default,null) : Int;
 
     var server : Server;
-    var peer : PeerConnection;
-    var iceCandidates : Array<IceCandidate>;
     var clients : Array<Client>;
+    var canvas : CanvasElement;
+    var context : CanvasRenderingContext2D;
 
     public function new( ip : String, port : Int ) {
         super();
@@ -71,52 +156,56 @@ class HMDHost extends Module {
 
     override function init( ?callback : Void->Void ) {
 
-        clients = [];
-        iceCandidates = [];
+        canvas = document.createCanvasElement();
+        canvas.width = vision.display.width;
+        canvas.height = vision.display.height;
+        canvas.style.position = 'fixed';
+        canvas.style.zIndex = '-1';
+        document.body.appendChild( canvas );
 
-        peer = untyped __js__( 'new webkitRTCPeerConnection({iceServers:[]})' );
-        peer.onicecandidate = function(e) {
-            //trace(e); //TODO seems to work without sending candidates on local network
+        context = canvas.getContext2d();
+        context.fillStyle = '#00ff00';
+        context.font = '100px Noto Sans';
+
+        clients = [];
+
+        server = Net.createServer( function(socket:Socket) {
+            console.log( "Socket connected" );
+            var client = new Client( socket );
+            client.onDisconnect = function() {
+                console.log( "Client disconnected" );
+                clients.remove( client );
+            }
+            clients.push( client );
+        });
+        server.listen( port, ip, function() {
+            callback();
+        });
+
+        //TODO get sound waveform
+    }
+
+    override function render() {
+
+        context.clearRect( 0, 0, canvas.width, canvas.height );
+        context.drawImage( vision.display.canvas, 0, 0, canvas.width, canvas.height );
+
+        context.font = '60px Noto Sans';
+        context.fillText( ''+Std.string( Std.int(om.Time.now()) ), 20, 100 );
+
+        for( client in clients ) {
+            client.render( canvas );
+            //client.render( vision.display.canvas );
         }
 
-        var stream = vision.display.captureStream();
-        peer.addStream( stream );
-
-        peer.createOffer( { offerToReceiveAudio: 0,	offerToReceiveVideo: 1 } )
-            .then( function(desc) peer.setLocalDescription( desc ) )
-            .then( function(_) {
-
-                server = Net.createServer( function(socket:Socket) {
-                    var client = new Client( socket );
-                    client.onMessage = function(msg) {
-                        trace(msg);
-                        switch msg.type {
-                        case 'boot':
-                            client.sendMessage( { sdp: peer.localDescription } );
-                        case 'sdp':
-                            peer.setRemoteDescription( new SessionDescription( msg.sdp ) ).then( function(e){
-                                trace('Set remote success');
-                            });
-                        }
-                    }
-                    client.onDisconnect = function() {
-                        trace( "Client disconnected" );
-                        clients.remove( client );
-                    }
-                    clients.push( client );
-                });
-
-                server.listen( port, ip, function() {
-                    callback();
-                });
-            }
-        );
+        //TODO render ui
     }
 
     override function stop() {
-        peer.close();
-        server.close();
+        for( client in clients ) {
+            client.disconnect();
+        }
         clients = [];
-        iceCandidates = [];
+        server.close();
     }
 }

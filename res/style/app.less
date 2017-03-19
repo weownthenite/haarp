@@ -49,10 +49,21 @@ body {
     #intro.activity {
         .title {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%,-50%);
-            //text-align: center;
+            cursor: default;
+            -webkit-user-select: none;
+        }
+    }
+
+    #boot.activity {
+        .title {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            cursor: default;
+            text-transform: uppercase;
+            -webkit-user-select: none;
         }
     }
 
@@ -84,6 +95,9 @@ body {
 
         background: #000;
         color: #fff;
+
+        position: fixed;
+        z-index: 1000;
 
         //cursor: none;
 

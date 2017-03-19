@@ -11,7 +11,7 @@ class Main {
 
     static function start( vision : String ) {
 
-        println( '\033c\n  H  A  A  R  P   -   '+vision.toUpperCase() );
+        println( '\033cH  A  A  R  P   -   '+vision.toUpperCase() );
 
         var win = new BrowserWindow( {
             show: false,
@@ -62,25 +62,22 @@ class Main {
     }
 
     static function main() {
-
         electron.main.App.on( 'ready', function(e) {
             var args = Sys.args();
             if( args.length == 0 )
-                exit( 'Wat?' );
+                exit( 'No vivions?' );
             var i = 0;
             while( i < args.length ) {
                 var opt = args[i];
-                trace(opt);
                 switch opt {
-                case '-help':
+                case '-help','-h':
                     exit( 'Help yourself' );
-                case '-version':
+                case '-version','-v':
                     exit( 'v' + electron.main.App.getVersion() );
                 case '-vision':
                     var vision = args[i+1];
                     if( vision == null )
                         exit( 'No vision given', -1 );
-                    //untyped electron.main.App.commandLine.appendSwitch( 'enable-web-bluetooth', true );
                     electron.main.Menu.setApplicationMenu( null );
                     start( vision );
                 }

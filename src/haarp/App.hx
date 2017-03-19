@@ -27,12 +27,12 @@ class App implements om.App {
     public static inline var RES = '/home/tong/dev/HAARP';
     public static inline var WEB = 'http://localhost/HAARP';
 
-    public static var ip(default,null) : String;
+    //public static var ip(default,null) : String;
 
-    public static var vision(default,null) : Vision;
+    //public static var vision(default,null) : Vision;
 
-    static var server : Server;
-
+    //static var server : Server;
+    /*
     static function load( name : String ) {
 
         console.group( name );
@@ -53,35 +53,39 @@ class App implements om.App {
                 //trace( Type.createInstance( 'haarp.module.'+mod.name, [] ) );
             }
         } );
-        */
+        * /
 
         vision.init(
             [
                 new haarp.module.Sound( '$WEB/sound/head-1-cut.wav' ),
                 //new haarp.module.Sound( '$WEB/sound/airplane.wav', true ),
-                new haarp.module.Drzllect( '$RES/image/archillect' ),
-                new haarp.module.Oscillator(),
+                //new haarp.module.Drzllect( '$RES/image/archillect' ),
+                //new haarp.module.VideoPlayer( '$RES/video/natural_born_killers/natural_born_killer_01.mp4' ),
+                new haarp.module.VideoPlayer( '$RES/video/sayat_nova/sayat_nova-19.mp4' ),
+                new haarp.module.SoundSpectrum(),
+                /*
+                new haarp.module.Group([
+                    new haarp.module.VideoPlayer( '$RES/video/sayat_nova/sayat_nova-19.mp4' ),
+                    new haarp.module.SoundSpectrum(),
+                ]),
+                * /
                 //new haarp.module.TestModule(1000),
                 new haarp.module.HMDHost( ip, 7000 ),
+                //new haarp.module.RemoteStream( ip, 8000 ),
             ],
             function() {
                 intro.replace( new haarp.app.VisionActivity( vision ) );
             }
         );
     }
+    */
 
-    static function init() {
+    static inline function init() {
 
         console.info( 'H  A  A  R  P' );
 
-        document.body.innerHTML = '';
-
-        ip = om.Network.getLocalIP()[0];
-        //ip = om.Network.getLocalIP()[1];
-        //trace("MYIP: "+ip );
-
-        var visionName = window.location.search.substr( 1 );
-        load( visionName );
+        var vision = window.location.search.substr( 1 );
+        Activity.boot( new haarp.app.BootActivity( vision ) );
     }
 
 }

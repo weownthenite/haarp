@@ -24,8 +24,8 @@ class Vision {
     public function init( modules : Array<Module>, callback : Void->Void ) {
         if( modules.length == 0 ) callback() else {
             var i = 0;
-            var loadModule : Void->Void;
-            loadModule = function() {
+            var initModule : Void->Void;
+            initModule = function() {
                 var mod = modules[i];
                 console.group( i+':'+mod.name );
                 mod.vision = this;
@@ -35,13 +35,18 @@ class Vision {
                         this.modules = modules;
                         callback();
                     } else {
-                        loadModule();
+                        initModule();
                     }
                 });
             }
-            loadModule();
+            initModule();
         }
     }
+
+    /*
+    public function addModule( module : Module ) {
+    }
+    */
 
     public function start() {
         started = true;

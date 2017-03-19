@@ -1,29 +1,9 @@
-package haarp;
+package haarp.module;
 
-@:allow(haarp.Vision)
-interface Module {
-
-    var name(default,null) : String;
-    var vision(default,null) : Vision;
-    //var loaded(default,null) : Bool;
-    var enabled : Bool;
-
-    //ublic function new( ?name : String, enabled = true ) : Void;
-
-    function init( ?callback : Void->Void ) : Void;
-    function start() : Void;
-    function update() : Void;
-    function render() : Void;
-    function stop() : Void;
-    function dispose() : Void;
-
-}
-
-/*
 using StringTools;
 
 @:allow(haarp.Vision)
-class Module {
+class AbstractModule implements Module {
 
     static inline var NAME_POSTFIX = 'Module';
 
@@ -51,23 +31,22 @@ class Module {
         this.enabled = enabled;
     }
 
-    function init( ?callback : Void->Void ) {
+    public function init( ?callback : Void->Void ) {
         if( callback != null ) callback();
     }
 
-    function start() {
+    public function start() {
     }
 
-    function update() {
+    public function update() {
     }
 
-    function render() {
+    public function render() {
     }
 
-    function stop() {
+    public function stop() {
     }
 
-    function dispose() {
+    public function dispose() {
     }
 }
-*/

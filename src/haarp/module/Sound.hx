@@ -6,7 +6,7 @@ import js.html.audio.AudioBuffer;
 import js.html.audio.AudioBufferSourceNode;
 import om.audio.AudioBufferLoader;
 
-class Sound extends Module {
+class Sound extends AbstractModule {
 
     public var url(default,null) : String;
     public var loop : Bool;
