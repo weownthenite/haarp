@@ -9,6 +9,8 @@ class VisionActivity extends om.Activity {
 
     var vision : Vision;
     var animationFrameId : Int;
+    //var gamepad : Gamepad;
+    var gamepadDevices : Array<js.html.Gamepad>;
 
     public function new( vision : Vision ) {
 
@@ -21,29 +23,36 @@ class VisionActivity extends om.Activity {
     }
 
     override function onCreate() {
+
         super.onCreate();
+
+
         element.appendChild( vision.display.canvas );
+
+        gamepadDevices = [];
+        //gamepad = new Gamepad();
     }
 
     override function onStart() {
 
         super.onStart();
 
-        console.group( 'start' );
+        console.group( 'Vision start' );
 
-        startVision();
+startVision();
 
         animationFrameId = window.requestAnimationFrame( update );
 
         window.addEventListener( 'resize', handleWindowResize, false );
         window.addEventListener( 'keydown', handleKeyDown, false );
+
     }
 
     override function onStop() {
 
         super.onStop();
 
-        console.groupEnd( 'stop' );
+        console.groupEnd( 'Vision end' );
 
         stopVision();
 
@@ -55,7 +64,6 @@ class VisionActivity extends om.Activity {
     }
 
     function startVision() {
-        trace("startVision");
         //animationFrameId = window.requestAnimationFrame( update );
         vision.start();
     }
@@ -70,6 +78,23 @@ class VisionActivity extends om.Activity {
     function update( time : Float ) {
 
         animationFrameId = window.requestAnimationFrame( update );
+
+        var gamepads = js.Browser.navigator.getGamepads();
+        var changedGamepads = new Array<js.html.Gamepad>();
+        for( i in 0...gamepads.length ) {
+            if( gamepads[i] != gamepadDevices[i] ) {
+                gamepadDevices[i] = gamepads[i];
+                changedGamepads.push( gamepadDevices[i] );
+            }
+        }
+
+        /*
+        //trace(changedGamepads);
+        trace(gamepadDevices);
+        for( gamepad in gamepadDevices ) {
+            if( )
+        }
+        */
 
         /*
         var gamepads = js.Browser.navigator.getGamepads();
@@ -96,9 +121,12 @@ class VisionActivity extends om.Activity {
     function handleKeyDown( e : KeyboardEvent ) {
         //trace(e.keyCode);
         switch e.keyCode {
-        case 13:
-        case 32:
+        case 27: // esc
+            //vision.started ? stopVision() : startVision();
+        case 13: // enter
             vision.started ? stopVision() : startVision();
+        case 32: // space
+            //vision.togglePause();
         }
     }
 

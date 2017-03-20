@@ -62,10 +62,16 @@ class Main {
     }
 
     static function main() {
+
         electron.main.App.on( 'ready', function(e) {
+
             var args = Sys.args();
             if( args.length == 0 )
                 exit( 'No vivions?' );
+
+            electron.main.Menu.setApplicationMenu( null );
+
+            //var visions = new Array<String>();
             var i = 0;
             while( i < args.length ) {
                 var opt = args[i];
@@ -77,12 +83,15 @@ class Main {
                 case '-vision':
                     var vision = args[i+1];
                     if( vision == null )
-                        exit( 'No vision given', -1 );
-                    electron.main.Menu.setApplicationMenu( null );
+                        exit( 'Missing vision name', -1 );
+                    //visions.push( vision );
+                    //electron.main.Menu.setApplicationMenu( null );
                     start( vision );
                 }
                 i++;
             }
+
+
         });
     }
 

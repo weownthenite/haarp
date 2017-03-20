@@ -64,6 +64,7 @@ private class Client {
                 console.error( e );
                 return;
             }
+            trace(msg);
         } catch(e:Dynamic) {
             console.error( 'failed to read websocket frame\n'+buf[0] );
             return;
@@ -86,6 +87,16 @@ private class Client {
             var stream = untyped canvas.captureStream();
             //peer.addTrack( stream );
             peer.addStream( stream );
+
+            /*
+            var videoTracks = stream.getVideoTracks();
+            if( videoTracks.length > 0 ) {
+                trace( 'Using video device: ' + videoTracks[0].label );
+                trace( videoTracks );
+            }
+            //var audioTracks = stream.getAudioTracks();
+            //if( audioTracks.length > 0 ) trace( 'Using audio device: ' + audioTracks[0].label) ;
+            */
 
             var channel = peer.createDataChannel( "channel-1" );
             channel.onopen = function(e) {

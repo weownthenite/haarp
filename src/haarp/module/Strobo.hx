@@ -10,7 +10,7 @@ enum StroboMode {
 }
 */
 
-class Strobo extends Module {
+class Strobo extends AbstractModule {
 
     public var color : String;
     public var showDuration(default,null) : Int;
@@ -21,17 +21,15 @@ class Strobo extends Module {
     var context : CanvasRenderingContext2D;
 
     public function new( color : String = '#fff', showDuration = 200, pauseDuration = 500 ) {
-
         super();
         this.color = color;
         this.showDuration = showDuration;
         this.pauseDuration = pauseDuration;
-
         active = false;
     }
 
     override function init( ?callback : Void->Void ) {
-        context = vision.canvas.getContext2d();
+        context = vision.display.getContext2d();
         callback();
     }
 
@@ -39,33 +37,30 @@ class Strobo extends Module {
         lastChangeTime = now();
     }
 
-    override function update() {
+    override function render() {
 
         var now = now();
         var diff = now - lastChangeTime;
 
         if( active ) {
-            context.fillStyle = color;
-            context.fillRect( 0, 0, vision.canvas.width, vision.canvas.height );
             if( diff > showDuration ) {
                 active = false;
                 lastChangeTime = now;
+            } else {
+                draw();
             }
         } else {
             if( diff > pauseDuration ) {
                 active = true;
-                context.fillStyle = color;
-                context.fillRect( 0, 0, vision.canvas.width, vision.canvas.height );
+                draw();
                 lastChangeTime = now;
             }
         }
     }
 
-    /*
-    function show() {
+    function draw() {
         context.fillStyle = color;
-        context.fillRect( 0, 0, vision.canvas.width, vision.canvas.height );
-        //block = true;
+        context.fillRect( 0, 0, vision.display.width, vision.display.height );
     }
-    */
+
 }

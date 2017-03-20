@@ -8,7 +8,7 @@ import js.node.Buffer;
 import js.node.Fs;
 import haxe.crypto.Base64;
 
-class Drzllect extends Module {
+class Drzllect extends AbstractModule {
 
     var path : String;
     var images : Array<ImageBitmap>;
