@@ -1,73 +1,30 @@
 package haarp;
 
-@:allow(haarp.Vision)
-interface Module {
+import js.Promise;
 
-    var name(default,null) : String;
-    var vision(default,null) : Vision;
-    //var loaded(default,null) : Bool;
-    var enabled : Bool;
-
-    //ublic function new( ?name : String, enabled = true ) : Void;
-
-    function init( ?callback : Void->Void ) : Void;
-    function start() : Void;
-    function update() : Void;
-    function render() : Void;
-    function stop() : Void;
-    function dispose() : Void;
-
-}
-
-/*
-using StringTools;
-
-@:allow(haarp.Vision)
 class Module {
 
-    static inline var NAME_POSTFIX = 'Module';
-
-    public var name(default,null) : String;
     public var vision(default,null) : Vision;
-
     public var enabled : Bool;
-    //public var alpha : Bool; //TODO on layer
-    //public var fx : Bool; //TODO on layer
+    public var started(default,null) : Bool;
 
-    public function new( ?name : String, enabled = true ) {
-
-        if( name == null ) {
-            var cname = Type.getClassName( Type.getClass( this ) );
-            var i = cname.lastIndexOf( '.' );
-            if( i != -1 ) cname = cname.substring( i+1 );
-			if( cname.endsWith( NAME_POSTFIX ) ) {
-                cname = cname.substring( 0, cname.length - NAME_POSTFIX.length );
-            }
-            //name = cname.toLowerCase();
-            name = cname;
-        }
-
-        this.name = name;
+    public function new( enabled = true ) {
         this.enabled = enabled;
+        started = false;
     }
 
-    function init( ?callback : Void->Void ) {
-        if( callback != null ) callback();
+    function init<T:Module>() : Promise<T> {
+        return Promise.resolve();
     }
 
-    function start() {
+    inline function toggleStart() {
+        started ? stop() : start();
     }
 
-    function update() {
-    }
+    function start() {}
+    function stop() {}
+    function update( time : Float ) {}
+    function render() {}
+    function dispose() {}
 
-    function render() {
-    }
-
-    function stop() {
-    }
-
-    function dispose() {
-    }
 }
-*/

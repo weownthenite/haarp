@@ -14,11 +14,19 @@
 -js bin/app.js
 -main haarp.App
 -lib om.app
--lib om.activity
 -lib om.audio
--lib om.input
+#-lib om.input
 -lib om.net
--lib om.three
+#-lib om.three
+-lib om.tween
 -D app_name=haarp
 -D app_version=0.1.0
 -D web
+#-D HEAD1B
+
+#--next
+#-js bin/app.js
+#-main haarp.App
+#-lib om.app
+#-lib om.audio
+#-D HEAD1B

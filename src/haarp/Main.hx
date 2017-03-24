@@ -9,9 +9,7 @@ import Sys.println;
 
 class Main {
 
-    static function start( vision : String ) {
-
-        println( '\033cH  A  A  R  P   -   '+vision.toUpperCase() );
+    static function createWindow( vision : String ) : BrowserWindow{
 
         var win = new BrowserWindow( {
             show: false,
@@ -49,6 +47,7 @@ class Main {
             */
         });
         win.loadURL( 'file://' + Node.__dirname + '/app.html?'+vision );
+        return win;
     }
 
     static function quit( ?info : String ) {
@@ -63,15 +62,17 @@ class Main {
 
     static function main() {
 
+        println( '\033c\n   \tH  A  A  R  P' );
+
+        electron.main.App.disableHardwareAcceleration();
         electron.main.App.on( 'ready', function(e) {
 
             var args = Sys.args();
-            if( args.length == 0 )
-                exit( 'No vivions?' );
+            if( args.length == 0 ) exit( 'No vivions?' );
 
             electron.main.Menu.setApplicationMenu( null );
 
-            //var visions = new Array<String>();
+            var visions = new Array<String>();
             var i = 0;
             while( i < args.length ) {
                 var opt = args[i];
@@ -84,14 +85,47 @@ class Main {
                     var vision = args[i+1];
                     if( vision == null )
                         exit( 'Missing vision name', -1 );
-                    //visions.push( vision );
-                    //electron.main.Menu.setApplicationMenu( null );
-                    start( vision );
+                    visions.push( vision );
+                    //start( vision );
                 }
                 i++;
             }
+            var windows = new Array<BrowserWindow>();
+            for( vision in visions ) {
+                var win = createWindow( vision );
+                windows.push( win );
+            }
 
 
+            /*
+            var bmp : String; //js.node.Buffer; //electron.NativeImage;
+
+            electron.main.IpcMain.on('asynchronous-message', function(e,arg){
+                //trace(e);
+                //trace(arg);
+
+                //e.sender.send( 'asynchronous-reply',bmp );
+            });
+            */
+
+            /*
+            var offscreen = new BrowserWindow({
+                show: false,
+                webPreferences: {
+                    offscreen: true
+                }
+            });
+            offscreen.webContents.on( did_finish_load, function(event, dirty, image) {
+                for( win in windows ) win.webContents.send( 'bmp', bmp);
+            });
+            offscreen.webContents.on('paint', function(event, dirty, image) {
+                //trace( offscreen.webContents);
+                bmp = image.toDataURL();
+                //offscreen.webContents.send('bmp', bmp);
+            });
+            offscreen.webContents.setFrameRate(60);
+            offscreen.loadURL('http://www.modul8.ch/documentation/modules_manual/#/How-to-build-modules-with-script_1-1');
+            */
         });
     }
 

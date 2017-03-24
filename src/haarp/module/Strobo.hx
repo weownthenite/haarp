@@ -1,5 +1,6 @@
 package haarp.module;
 
+import js.Promise;
 import js.html.CanvasRenderingContext2D;
 import om.Time.now;
 
@@ -8,9 +9,14 @@ enum StroboMode {
     interval( show : Int, pause : Int );
     sound( db : Int );
 }
+
+enum RenderMode {
+    color( value : String );
+    effect( value : String );
+}
 */
 
-class Strobo extends AbstractModule {
+class Strobo extends Module {
 
     public var color : String;
     public var showDuration(default,null) : Int;
@@ -28,9 +34,9 @@ class Strobo extends AbstractModule {
         active = false;
     }
 
-    override function init( ?callback : Void->Void ) {
+    override function init() {
         context = vision.display.getContext2d();
-        callback();
+        return cast super.init();
     }
 
     override function start() {
@@ -38,10 +44,8 @@ class Strobo extends AbstractModule {
     }
 
     override function render() {
-
         var now = now();
         var diff = now - lastChangeTime;
-
         if( active ) {
             if( diff > showDuration ) {
                 active = false;

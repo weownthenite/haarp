@@ -2,94 +2,107 @@ package haarp.module;
 
 import js.Browser.document;
 import js.Browser.window;
-import js.html.ImageBitmap;
+import js.Promise;
+import js.html.VideoElement;
 import js.html.CanvasRenderingContext2D;
+import js.html.ImageBitmap;
+import js.Browser.document;
 import js.node.Buffer;
 import js.node.Fs;
-import haxe.crypto.Base64;
 
-class Drzllect extends AbstractModule {
+class Drzllect extends Module {
 
-    var path : String;
+    public var path(default,null) : String;
+    public var index : Int;
+    //public var changeFactor : Float;
+
     var images : Array<ImageBitmap>;
-    var ctx : CanvasRenderingContext2D;
-    var index = 0;
+    var context : CanvasRenderingContext2D;
 
-    public function new( path : String ) {
-        super();
+    public function new( path : String, enabled = true ) {
+        super( enabled );
         this.path = path;
-        images = [];
     }
 
-    override function init( ?callback : Void->Void ) {
+    public override function init() {
 
-        super.init();
+        context = vision.display.getContext2d();
+        context.imageSmoothingEnabled = false;
 
-        ctx = vision.display.getContext2d();
-        ctx.imageSmoothingEnabled = false;
+        index = 0;
+        images = [];
 
-        Fs.readdir( path, function(e,files) {
-
-            if( e != null ) {
-                trace(e);
-                callback();
-            } else {
-                /*
-                for( i in 0...files.length ) {
-                    trace(">>"+i);
-                    var img = document.createImageElement();
-                    img.src = 'file://$path/'+files[i];
-                    img.onload = function() {
-                        window.createImageBitmap( img ).then( function( bmp ) {
-                            images.push( bmp );
-                            trace("ok "+images.length);
-                            if( images.length == files.length ) {
-                                callback();
-                            }
-                        });
-                    }
-                }
-                */
-
-                var img = document.createImageElement();
-                inline function loadImage( i : Int ) {
-                    img.src = 'file://$path/'+files[i];
-                    //img.src = 'http://localhost/HAARP/image/archillect/'+files[i];
-                }
-                img.onload = function(){
-                    window.createImageBitmap( img ).then( function( bmp ) {
-                        images.push( bmp );
-                        if( images.length == files.length ) {
-                            callback();
-                        } else {
-                            loadImage( images.length );
-                        }
-                    });
-                }
-                loadImage( 0 );
-                //img.src = 'data:image/jpg;base64,'+b.toString( 'base64' );
-            }
-        } );
+        return cast load( path );
     }
 
     override function render() {
 
-        if( !enabled )
+        var volume = vision.audio.meter.volume;
+        /*
+        if( volume < 0.003 ) {
+            //vision.display.clear();
             return;
+        }
+
+        trace(volume);
+        */
+
+        /*
+        if( volume > 0.04 ) {
+            index = Math.floor( Math.random() * images.length );
+		//	context.fillStyle = '#fff000';
+            //return;
+			//context.fillRect( 0, 0, vision.display.width, vision.display.height );
+		}
+        */
+
+        /*
+        //index = images.length - Std.int( images.length / (volume * 100) );
+        index = images.length - Std.int( images.length / (volume * 100) );
+        if( index >= images.length ) index = images.length-1;
+        else if( index < 0) index = 0;
+
+        //trace(volume,index);
+        //index = Math.floor( volume * images.length*100 );
+        */
 
         var img = images[index];
 
-        ctx.save();
-        ctx.scale( vision.display.width / img.width, vision.display.height / img.height );
-        ctx.drawImage( images[index], 0, 0 );
-        ctx.restore();
+        context.save();
+        context.scale( vision.display.width / img.width, vision.display.height / img.width );
+        context.drawImage( img, 0, 0 );
+        context.restore();
 
-        if( ++index == images.length ) index = 0;
+        index++;
+        if( index >= images.length ) index = 0;
     }
 
-    override function dispose() {
-        for( img in images ) {
-            //img.close();
-        }
+    public function load( path : String ) : Promise<Drzllect> {
+
+        return new Promise( function(resolve,reject) {
+
+            Fs.readdir( path, function(e,files) {
+
+                if( e != null ) reject( e ) else {
+
+                    var img = document.createImageElement();
+                    inline function loadImage( i : Int ) {
+                        img.src = 'file://$path/' + files[i];
+                    }
+                    img.onload = function(){
+                        //if( sys.FileSystem.exists( '$path/.meta/'+files[i] ) ) {
+                        window.createImageBitmap( img ).then( function( bmp ) {
+                            images.push( bmp );
+                            if( images.length == files.length ) {
+                                resolve( this );
+                            } else {
+                                loadImage( images.length );
+                            }
+                        });
+                    }
+                    loadImage( 0 );
+                }
+            });
+        });
     }
 }

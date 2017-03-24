@@ -1,91 +1,97 @@
 package haarp;
 
-import js.Browser.console;
+import js.Promise;
 import js.Browser.document;
 import js.Browser.window;
-import js.html.audio.AudioContext;
+import js.html.CanvasElement;
+import js.html.CanvasRenderingContext2D;
+import js.html.ImageBitmap;
+import om.Time;
 
-class Vision {
+@:access(haarp.Module)
+class Vision extends om.EventEmitter {
 
     public var name(default,null) : String;
-    public var started(default,null) : Bool;
-    public var sound(default,null) : Sound;
+    public var audio(default,null) : Audio;
     public var display(default,null) : Display;
+    public var started(default,null) : Bool;
+    public var frameTime(default,null) : Float;
+    //public var time(default,null) : Float;
 
     var modules : Array<Module>;
 
-    public function new() {
+    function new( name : String, canvas : CanvasElement ) {
+
+        super();
+        this.name = name;
+
         started = false;
-        sound = new Sound();
-        display = new Display( window.innerWidth, window.innerHeight );
+
+        audio = new Audio();
+        display = new Display( canvas );
+
         modules = [];
     }
 
-    public function init( modules : Array<Module>, callback : Void->Void ) {
-        if( modules.length == 0 ) callback() else {
-            var i = 0;
-            var initModule : Void->Void;
-            initModule = function() {
-                var mod = modules[i];
-                console.group( i+':'+mod.name );
-                mod.vision = this;
-                mod.init( function() {
-                    console.groupEnd();
-                    if( ++i == modules.length ) {
-                        this.modules = modules;
-                        callback();
-                    } else {
-                        initModule();
-                    }
-                });
-            }
-            initModule();
-        }
+    public function init() : Promise<Dynamic> {
+        return Promise.all( [for(m in modules) m.init()] );
     }
 
-    /*
-    public function addModule( module : Module ) {
+    public function add( module : Module ) {
+        module.vision = this;
+        modules.push( module );
     }
-    */
 
     public function start() {
+
+        frameTime = Time.now();
         started = true;
-        for( mod in modules ) mod.start();
+
+        for( m in modules ) {
+            m.started = true;
+            m.start();
+        }
+
+        emit( 'start', Time.now() );
     }
 
-    public function update() {
-        sound.update();
-        for( mod in modules ) {
-            if( mod.enabled ) {
-                mod.update();
-            }
+    public function stop() {
+
+        started = false;
+
+        for( m in modules ) {
+            m.started = false;
+            m.stop();
+        }
+
+        emit( 'stop', Time.now() );
+    }
+
+    public function update( time : Float ) {
+
+        frameTime = time;
+
+        audio.update();
+
+        for( m in modules ) {
+            if( m.enabled ) m.update( time );
         }
     }
 
     public function render() {
+
         display.clear();
-        for( mod in modules ) {
-            if( mod.enabled ) {
-                mod.render();
-            }
+
+        for( m in modules ) {
+            if( m.enabled ) m.render();
         }
     }
 
-    public function stop() {
+    public function dispose() {
+        //stop();
         started = false;
-        display.clear();
-        for( mod in modules ) mod.stop();
-    }
-
-    /*
-    public function draw( bmp : js.html.ImageBitmap ) {
-    }
-    */
-
-    public function serialize() {
-        return {
-            name: name
-        }
+        for( m in modules ) m.dispose();
+        modules = [];
     }
 
 }
