@@ -12,11 +12,11 @@ import om.Time;
 class Vision extends om.EventEmitter {
 
     public var name(default,null) : String;
-    public var audio(default,null) : Audio;
-    public var display(default,null) : Display;
     public var started(default,null) : Bool;
     public var frameTime(default,null) : Float;
     //public var time(default,null) : Float;
+    public var audio(default,null) : Audio;
+    public var display(default,null) : Display;
 
     var modules : Array<Module>;
 
@@ -26,11 +26,11 @@ class Vision extends om.EventEmitter {
         this.name = name;
 
         started = false;
+        modules = [];
 
         audio = new Audio();
+        
         display = new Display( canvas );
-
-        modules = [];
     }
 
     public function init() : Promise<Dynamic> {

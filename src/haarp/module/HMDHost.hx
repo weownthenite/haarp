@@ -48,6 +48,7 @@ private class Client {
         document.body.appendChild( canvas );
 
         context = canvas.getContext2d();
+        context.imageSmoothingEnabled = false;
         context.fillStyle = '#0000ff';
         context.font = '11px Anonymous Pro';
     }
@@ -169,6 +170,7 @@ class HMDHost extends Module {
         document.body.appendChild( canvas );
 
         context = canvas.getContext2d();
+        context.imageSmoothingEnabled = false;
         context.fillStyle = '#000';
         context.font = '11px Anonymous Pro';
 

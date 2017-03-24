@@ -17,14 +17,15 @@ class Module {
         return Promise.resolve();
     }
 
-    inline function toggleStart() {
-        started ? stop() : start();
-    }
-
     function start() {}
+
     function stop() {}
+
     function update( time : Float ) {}
+
     function render() {}
+
     function dispose() {}
 
+    inline function toggleStart() started ? stop() : start();
 }

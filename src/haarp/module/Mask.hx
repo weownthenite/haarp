@@ -4,23 +4,37 @@ import js.Browser.document;
 import js.Browser.window;
 import js.Promise;
 import js.html.CanvasRenderingContext2D;
-import js.html.ImageBitmap;
+import js.html.Path2D;
 
+/**
+    2D mask.
+**/
 class Mask extends Module {
+
+    public var path : Path2D;
 
     var context : CanvasRenderingContext2D;
 
-    public function new() {
+    public function new( path : Path2D ) {
         super();
+        this.path = path;
     }
 
-    public override function init() {
-        context = vision.display.getContext2d();
-        return cast super.init();
+    /*
+    override function init() {
+        return cast super.init().then( function(_){
+            context = vision.display.getContext2d();
+        });
     }
+    */
 
     override function render() {
 
+        if( path != null ) {
+            vision.display.clip( path );
+        }
+
+        /*
         //context.save();
 
         //context.globalCompositeOperation = 'lighter';
@@ -49,13 +63,6 @@ class Mask extends Module {
         context.clip();
 
         //context.restore();
-
-        /*
-        context.save();
-        context.scale( vision.display.width / bmp.width, vision.display.height / bmp.height );
-        context.drawImage( bmp, 0, 0 );
-        context.restore();
         */
     }
-
 }

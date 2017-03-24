@@ -33,33 +33,16 @@ class App implements om.App {
 
     static function init() {
 
-        document.body.onmousedown  = function(e) {
-            switch e.which {
-            case 1:
-            case 3: toggleFullScreen();
-            }
-        }
-
         var name = window.location.search.substr( 1 );
-        console.info( name );
-
-        var canvas = document.createCanvasElement();
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        document.body.appendChild( canvas );
+        console.info( name);
 
         #if HEAD1B
-        vision = new haarp.vision.HEAD1B( canvas, '$RES/video/danzig' );
+        vision = new haarp.vision.HEAD1B( '$RES/video/danzig' );
         #else
-        vision = new haarp.vision.HEAD1A( canvas );
+        vision = new haarp.vision.HEAD1A();
         #end
 
-        console.group( 'Vision' );
-        console.log( 'init' );
-
         vision.init().then( function(e){
-
-            console.log( 'ready' );
 
             haxe.Timer.delay( function(){
 
@@ -70,9 +53,15 @@ class App implements om.App {
 
             }, 200 );
 
+            document.body.onmousedown  = function(e) {
+                switch e.which {
+                case 1:
+                case 3: toggleFullScreen();
+                }
+            }
+
         }).catchError( function(e) {
             console.error( e );
-            console.groupEnd();
             return;
         });
     }
