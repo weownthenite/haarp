@@ -1,2 +1,4 @@
 #!/bin/sh
-electron ~/dev/project/haarp/bin $@
+PATH_HAARP="/home/tong/dev/project/haarp"
+PATH_ELECTRON="$PATH_HAARP/bin/node_modules/.bin/electron"
+$PATH_ELECTRON $PATH_HAARP/bin $@

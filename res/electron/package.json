@@ -1,11 +1,12 @@
 {
     "name"    : "HAARP",
-    "version" : "0.2.0",
+    "version" : "0.3.0",
+    "description": "Mind bender",
     "main"    : "main.js",
     "scripts": {
         "start": "electron main.js"
     },
     "devDependencies": {
-        "electron": "^1.4.12"
+        "electron": "^1.6.0"
     }
 }

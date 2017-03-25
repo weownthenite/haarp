@@ -13,12 +13,12 @@ class Vision extends om.EventEmitter {
 
     public var name(default,null) : String;
     public var started(default,null) : Bool;
-    public var frameTime(default,null) : Float;
-    //public var time(default,null) : Float;
+    public var time(default,null) : Float;
     public var audio(default,null) : Audio;
     public var display(default,null) : Display;
 
     var modules : Array<Module>;
+    var startTime : Float;
 
     function new( name : String, canvas : CanvasElement ) {
 
@@ -29,7 +29,7 @@ class Vision extends om.EventEmitter {
         modules = [];
 
         audio = new Audio();
-        
+
         display = new Display( canvas );
     }
 
@@ -44,7 +44,8 @@ class Vision extends om.EventEmitter {
 
     public function start() {
 
-        frameTime = Time.now();
+        time = 0;
+        startTime = Time.now();
         started = true;
 
         for( m in modules ) {
@@ -58,6 +59,7 @@ class Vision extends om.EventEmitter {
     public function stop() {
 
         started = false;
+        time = startTime = null;
 
         for( m in modules ) {
             m.started = false;
@@ -67,9 +69,10 @@ class Vision extends om.EventEmitter {
         emit( 'stop', Time.now() );
     }
 
-    public function update( time : Float ) {
+    public function update() {
 
-        frameTime = time;
+        var now = Time.now();
+        time = now - startTime;
 
         audio.update();
 
@@ -88,8 +91,7 @@ class Vision extends om.EventEmitter {
     }
 
     public function dispose() {
-        //stop();
-        started = false;
+        stop();
         for( m in modules ) m.dispose();
         modules = [];
     }

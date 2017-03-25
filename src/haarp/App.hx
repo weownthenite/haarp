@@ -1,9 +1,7 @@
 package haarp;
 
-import haxe.Json;
 import js.Browser.console;
 import js.Browser.document;
-import js.Browser.navigator;
 import js.Browser.window;
 import om.Time;
 
@@ -19,8 +17,11 @@ class App implements om.App {
 
         window.requestAnimationFrame( update );
 
-        var time = (Time.now() - startTime) / 1000;
-        vision.update( time );
+        //var time = (Time.now() - startTime) / 1000;
+        //vision.update( time );
+        //vision.render();
+
+        vision.update();
         vision.render();
     }
 

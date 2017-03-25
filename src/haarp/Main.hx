@@ -35,6 +35,7 @@ class Main {
             win.show();
         });
         win.webContents.on( did_finish_load, function() {
+
             #if debug
             win.webContents.openDevTools();
             #end
@@ -46,7 +47,9 @@ class Main {
             });
             */
         });
+
         win.loadURL( 'file://' + Node.__dirname + '/app.html?'+vision );
+
         return win;
     }
 
@@ -64,11 +67,13 @@ class Main {
 
         println( '\033c\n   \tH  A  A  R  P' );
 
-        electron.main.App.disableHardwareAcceleration();
+        //electron.main.App.disableHardwareAcceleration();
+
         electron.main.App.on( 'ready', function(e) {
 
             var args = Sys.args();
-            if( args.length == 0 ) exit( 'No vivions?' );
+            if( args.length == 0 )
+                exit( 'No vivions?' );
 
             electron.main.Menu.setApplicationMenu( null );
 
@@ -95,37 +100,6 @@ class Main {
                 var win = createWindow( vision );
                 windows.push( win );
             }
-
-
-            /*
-            var bmp : String; //js.node.Buffer; //electron.NativeImage;
-
-            electron.main.IpcMain.on('asynchronous-message', function(e,arg){
-                //trace(e);
-                //trace(arg);
-
-                //e.sender.send( 'asynchronous-reply',bmp );
-            });
-            */
-
-            /*
-            var offscreen = new BrowserWindow({
-                show: false,
-                webPreferences: {
-                    offscreen: true
-                }
-            });
-            offscreen.webContents.on( did_finish_load, function(event, dirty, image) {
-                for( win in windows ) win.webContents.send( 'bmp', bmp);
-            });
-            offscreen.webContents.on('paint', function(event, dirty, image) {
-                //trace( offscreen.webContents);
-                bmp = image.toDataURL();
-                //offscreen.webContents.send('bmp', bmp);
-            });
-            offscreen.webContents.setFrameRate(60);
-            offscreen.loadURL('http://www.modul8.ch/documentation/modules_manual/#/How-to-build-modules-with-script_1-1');
-            */
         });
     }
 

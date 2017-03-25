@@ -13,18 +13,13 @@ import om.audio.VolumeMeter;
 class Audio {
 
     public var context(default,null) : AudioContext;
-
-    //public var time(get,null) : Float;
-    //inline function get_time() return context.currentTime;
+    public var meter(default,null) : VolumeMeter;
+    public var frequencyData(default,null) : Uint8Array;
+    public var timeDomainData(default,null) : Uint8Array;
 
     public var volume(get,set) : Float;
     inline function get_volume() return gain.gain.value;
     inline function set_volume(v) return gain.gain.value = v;
-
-    public var meter(default,null) : VolumeMeter;
-
-    public var frequencyData(default,null) : Uint8Array;
-    public var timeDomainData(default,null) : Uint8Array;
 
     var gain : GainNode;
     var analyser : AnalyserNode;
@@ -36,20 +31,23 @@ class Audio {
         gain = context.createGain();
 		gain.gain.value = volume;
 
-        meter = new VolumeMeter( context, 512, 0.98, 0.95, 750 );
-
         analyser = context.createAnalyser();
-		analyser.fftSize = 1024;
+		analyser.fftSize = 2048;
         frequencyData = new Uint8Array( analyser.frequencyBinCount );
 		timeDomainData = new Uint8Array( analyser.frequencyBinCount );
 
+        meter = new VolumeMeter( context, 512, 0.98, 0.95, 750 );
+
         gain.connect( analyser );
         analyser.connect( meter.processor );
-
         analyser.connect( context.destination );
     }
 
-    public function connect( node : AudioBufferSourceNode ) {
+    public inline function load( url : String ) : Promise<AudioBuffer> {
+        return AudioBufferLoader.loadAudioBuffer( context, url );
+    }
+
+    public inline function connect( node : AudioBufferSourceNode ) {
         node.connect( gain );
     }
 
@@ -58,8 +56,13 @@ class Audio {
         analyser.getByteTimeDomainData( timeDomainData );
     }
 
-    public inline function load( url : String ) : Promise<AudioBuffer> {
-        return AudioBufferLoader.loadAudioBuffer( context, url );
+    /*
+    public function mute() {
+        gain.gain.value = 0;
     }
 
+    public function unmute() {
+        gain.gain.value = 0;
+    }
+    */
 }

@@ -1,9 +1,9 @@
 -cp src
 -lib electron
 -dce full
--debug
 #--no-traces
 #-D release
+-debug
 --each
 
 --next
@@ -15,13 +15,13 @@
 -main haarp.App
 -lib om.app
 -lib om.audio
-#-lib om.input
 -lib om.net
 #-lib om.three
 -lib om.tween
--D app_name=haarp
--D app_version=0.1.0
--D web
+-lib hxnodejs-serialport
+#-D app_name=haarp
+#-D app_version=0.3.0
+#-D web
 #-D HEAD1B
 
 #--next
