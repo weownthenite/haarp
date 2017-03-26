@@ -39,6 +39,7 @@ class Video extends DisplayModule {
             video.muted = true;
             video.loop = true;
             //video.autoplay = true;
+            video.onerror = function(e) reject( e );
             video.addEventListener( 'ended', function(e) {
                 trace(e);
                 onEnd();
@@ -55,12 +56,22 @@ class Video extends DisplayModule {
     }
 
     override function start() {
-        //video.currentTime =n 0;
+        //video.currentTime = 0;
+        video.play();
+    }
+
+    override function pause() {
+        video.pause();
+    }
+
+    override function resume() {
+        //video.currentTime = ;
         video.play();
     }
 
     override function stop() {
         video.pause();
+        video.currentTime = 0;
     }
 
     override function render() {

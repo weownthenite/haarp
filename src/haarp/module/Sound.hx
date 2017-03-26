@@ -3,6 +3,7 @@ package haarp.module;
 import js.Promise;
 import js.html.audio.AudioBuffer;
 import js.html.audio.AudioBufferSourceNode;
+import js.html.audio.AudioNode;
 import om.Time;
 import om.audio.AudioBufferLoader;
 
@@ -11,6 +12,9 @@ class Sound extends Module {
     public var path(default,null) : String;
     public var startOffset(default,null) : Float;
     public var loop : Bool;
+
+    public var node(get,never) : AudioNode;
+    inline function get_node() return source;
 
     public var duration(get,null) : Float;
     inline function get_duration() return buffer.duration;
@@ -21,13 +25,16 @@ class Sound extends Module {
 
     var buffer : AudioBuffer;
     var source : AudioBufferSourceNode;
-    //var startTime : Float;
+    var timeStart : Float;
+    var timePauseStart : Float;
 
     public function new( path : String, loop = false, startOffset = 0.0 ) {
         super();
         this.path = path;
         this.loop = loop;
         this.startOffset = startOffset;
+        timeStart = 0;
+        timePauseStart = 0;
     }
 
     override function init() {
@@ -36,22 +43,31 @@ class Sound extends Module {
 
     override function start() {
 
-        //startTime = vision.time;
-
         source = vision.audio.context.createBufferSource();
         source.onended = function() if( loop ) start();
         source.buffer = buffer;
-        source.start( 0, startOffset );
 
-        vision.audio.connect( source );
+        if( timePauseStart > 0 ) {
+            timeStart = Time.now() - timePauseStart;
+            source.start( 0, timePauseStart / 1000 );
+        } else {
+            timeStart = Time.now();
+            source.start();
+        }
     }
 
     override function stop() {
-        if( source != null ) {
-            source.onended = null;
-            source.stop();
-            source = null;
-        }
+        source.onended = null;
+        source.stop();
+    }
+
+    override function pause() {
+        source.stop();
+        timePauseStart = Time.now() - timeStart;
+    }
+
+    override function resume() {
+        start();
     }
 
     public function load( path : String ) {

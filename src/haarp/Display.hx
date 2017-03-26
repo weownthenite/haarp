@@ -2,11 +2,13 @@ package haarp;
 
 import js.Browser.document;
 import js.Browser.window;
-import js.html.ImageBitmap;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
+import js.html.ImageBitmap;
 import js.html.Path2D;
 import haarp.display.CompositeOperation;
+
+// abstract ?
 
 class Display {
 
@@ -29,6 +31,8 @@ class Display {
     public var imageSmoothingEnabled(get,set) : Bool;
     inline function get_imageSmoothingEnabled() return context.imageSmoothingEnabled;
     inline function set_imageSmoothingEnabled(v:Bool) return context.imageSmoothingEnabled = v;
+
+    public var autoClear = true;
 
     var canvas : CanvasElement;
     var context : CanvasRenderingContext2D;
@@ -63,17 +67,17 @@ class Display {
         context.drawImage( bmp, 0, 0 );
     }
 
+    public function fitCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
     public function dispose() {
         window.removeEventListener( 'resize', handleResize );
     }
 
     function handleResize(e) {
         fitCanvas();
-    }
-
-    function fitCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
     }
 
 }

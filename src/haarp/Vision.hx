@@ -1,6 +1,7 @@
 package haarp;
 
 import js.Promise;
+import js.Browser.console;
 import js.Browser.document;
 import js.Browser.window;
 import js.html.CanvasElement;
@@ -8,33 +9,52 @@ import js.html.CanvasRenderingContext2D;
 import js.html.ImageBitmap;
 import om.Time;
 
+private enum State {
+    //create;
+    //init;
+    //idle;
+    Play;
+    Pause;
+    Stop;
+    //end;
+}
+
 @:access(haarp.Module)
-class Vision extends om.EventEmitter {
+class Vision {
+
+    public dynamic function onEnd() {}
 
     public var name(default,null) : String;
-    public var started(default,null) : Bool;
+    public var state(default,null) : State;
+    //public var started(default,null) : Bool;
     public var time(default,null) : Float;
     public var audio(default,null) : Audio;
     public var display(default,null) : Display;
 
+    var timeStart : Float;
+    var timePauseStart : Float;
+    var timePauseOffset : Float;
+
     var modules : Array<Module>;
-    var startTime : Float;
 
     function new( name : String, canvas : CanvasElement ) {
 
-        super();
         this.name = name;
 
-        started = false;
+        //state = create;
+        time = timePauseOffset = 0;
+
         modules = [];
 
         audio = new Audio();
-
         display = new Display( canvas );
     }
 
     public function init() : Promise<Dynamic> {
-        return Promise.all( [for(m in modules) m.init()] );
+        //state = State.init;
+        return Promise.all( [for(m in modules) m.init()] ).then( function(_){
+            state = Stop;
+        });
     }
 
     public function add( module : Module ) {
@@ -44,35 +64,48 @@ class Vision extends om.EventEmitter {
 
     public function start() {
 
+        console.log( 'Vision start' );
+
+        state = Play;
+        timeStart = Time.now();
         time = 0;
-        startTime = Time.now();
-        started = true;
 
         for( m in modules ) {
-            m.started = true;
+            //m.state = play;
             m.start();
         }
+    }
 
-        emit( 'start', Time.now() );
+    public function pause() {
+        state = Pause;
+        timePauseStart = time;
+        for( m in modules ) m.pause();
+    }
+
+    public function resume() {
+        state = Play;
+        timePauseOffset += time - timePauseStart;
+        timePauseStart = null;
+        for( m in modules ) m.resume();
     }
 
     public function stop() {
 
-        started = false;
-        time = startTime = null;
+        state = Stop;
+        time = 0;
+        timeStart = -1;
 
         for( m in modules ) {
-            m.started = false;
+            //m.started = false;
+            //m.state = idle;
             m.stop();
         }
-
-        emit( 'stop', Time.now() );
     }
 
     public function update() {
 
         var now = Time.now();
-        time = now - startTime;
+        time = (now - timeStart - timePauseOffset);
 
         audio.update();
 
@@ -82,18 +115,25 @@ class Vision extends om.EventEmitter {
     }
 
     public function render() {
-
-        display.clear();
-
-        for( m in modules ) {
-            if( m.enabled ) m.render();
+    //    if( started ) {
+        if( state == Play ) {
+            if( display.autoClear ) display.clear();
+            for( m in modules ) {
+                if( m.enabled ) m.render();
+            }
         }
     }
 
     public function dispose() {
+
         stop();
+
         for( m in modules ) m.dispose();
-        modules = [];
+
+        audio.dispose();
+
+        display.clear();
+        display.dispose();
     }
 
 }

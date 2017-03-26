@@ -11,16 +11,9 @@ class App implements om.App {
     public static inline var WEB = 'http://localhost/HAARP';
 
     static var vision : Vision;
-    static var startTime : Float;
 
     static function update( time : Float ) {
-
         window.requestAnimationFrame( update );
-
-        //var time = (Time.now() - startTime) / 1000;
-        //vision.update( time );
-        //vision.render();
-
         vision.update();
         vision.render();
     }
@@ -43,16 +36,16 @@ class App implements om.App {
         vision = new haarp.vision.HEAD1A();
         #end
 
-        vision.init().then( function(e){
+        vision.init().then( function(_) {
 
-            haxe.Timer.delay( function(){
+            trace( 'Vision Ready' );
 
-                console.log( 'start' );
-                window.requestAnimationFrame( update );
-                startTime = Time.now();
-                vision.start();
+            window.requestAnimationFrame( update );
 
-            }, 200 );
+            vision.onEnd = function() {
+                console.info( 'Vision End' );
+            }
+            //vision.start();
 
             document.body.onmousedown  = function(e) {
                 switch e.which {
@@ -61,8 +54,10 @@ class App implements om.App {
                 }
             }
 
+
         }).catchError( function(e) {
             console.error( e );
+            document.body.style.background = '#FF1744';
             return;
         });
     }

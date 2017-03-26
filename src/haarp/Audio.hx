@@ -3,6 +3,7 @@ package haarp;
 import js.Promise;
 import js.html.Uint8Array;
 import js.html.audio.AudioContext;
+import js.html.audio.AudioNode;
 import js.html.audio.AudioBuffer;
 import js.html.audio.AudioBufferSourceNode;
 import js.html.audio.AnalyserNode;
@@ -11,6 +12,9 @@ import om.audio.AudioBufferLoader;
 import om.audio.VolumeMeter;
 
 class Audio {
+
+    public var node(get,never) : AudioNode;
+    inline function get_node() return gain;
 
     public var context(default,null) : AudioContext;
     public var meter(default,null) : VolumeMeter;
@@ -47,13 +51,19 @@ class Audio {
         return AudioBufferLoader.loadAudioBuffer( context, url );
     }
 
-    public inline function connect( node : AudioBufferSourceNode ) {
+    /*
+    public inline function connect( node : AudioNode ) {
         node.connect( gain );
     }
+    */
 
     public function update() {
         analyser.getByteFrequencyData( frequencyData );
         analyser.getByteTimeDomainData( timeDomainData );
+    }
+
+    public function dispose() {
+        context.close();
     }
 
     /*

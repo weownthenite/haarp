@@ -1,4 +1,4 @@
-package haarp.input;
+package haarp.module;
 
 import js.Browser.console;
 import js.Browser.navigator;
@@ -9,13 +9,14 @@ typedef AnalogStick = {
     var y : Float;
 }
 
-class Gamepad {
+class Gamepad extends Module {
 
     static var BTN_NIL = { pressed: false, value:0 };
 
+    public dynamic function onConnect() {}
     public dynamic function onButtonPress( id : String ) {}
     public dynamic function onButtonRelease( id : String ) {}
-    public dynamic function onAxe( id : String, value : AnalogStick ) {}
+    public dynamic function onStick( id : String, value : AnalogStick ) {}
 
     public var id(get,null) : String;
     inline function get_id() return (device == null) ? null : device.id;
@@ -59,10 +60,11 @@ class Gamepad {
     var device : js.html.Gamepad;
 
     public function new() {
+        super();
         devices = [];
     }
 
-    public function update() {
+    override function update( time : Float ) {
 
         var devices = navigator.getGamepads();
         for( i in 0...devices.length ) {
@@ -75,6 +77,7 @@ class Gamepad {
                     if( this.device == null ) {
                         console.log( 'Gamepad connected' );
                         this.device = devices[i];
+
                     }
                 }
             }
@@ -180,20 +183,20 @@ class Gamepad {
             if( _STICK_L.x != STICK_L.x || _STICK_L.y != STICK_L.y ) {
                 STICK_L.x = _STICK_L.x;
                 STICK_L.y = _STICK_L.y;
-                onAxe( 'L', STICK_L );
+                onStick( 'L', STICK_L );
             }
             var _STICK_R : AnalogStick = { x: device.axes[2], y: device.axes[3] };
             if( _STICK_R.x != STICK_R.x || _STICK_R.y != STICK_R.y ) {
                 STICK_R.x = _STICK_R.x;
                 STICK_R.y = _STICK_R.y;
-                onAxe( 'R', STICK_R );
+                onStick( 'R', STICK_R );
             }
 
             //for( stick in moved ) onButtonPress( btn );
         }
     }
 
-    public function dispose() {
+    override function dispose() {
         devices = [];
     }
 
