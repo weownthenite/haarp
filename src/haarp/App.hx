@@ -3,7 +3,6 @@ package haarp;
 import js.Browser.console;
 import js.Browser.document;
 import js.Browser.window;
-import om.Time;
 
 class App implements om.App {
 
@@ -55,7 +54,6 @@ class App implements om.App {
                 case 3: toggleFullScreen();
                 }
             }
-
 
         }).catchError( function(e) {
             console.error( e );

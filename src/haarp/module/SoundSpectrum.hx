@@ -5,7 +5,7 @@ class SoundSpectrum extends Module {
     public var color : String;
     public var lineWidth : Int;
 
-    public function new( color = '#fff', lineWidth = 100 ) {
+    public function new( color = '#fff', lineWidth = 1 ) {
         super();
         this.color = color;
         this.lineWidth = lineWidth;
@@ -19,7 +19,6 @@ class SoundSpectrum extends Module {
         var ctx = vision.display.getContext2d();
 
         ctx.save();
-
         ctx.beginPath();
         ctx.strokeStyle = color;
         ctx.lineWidth = lineWidth;

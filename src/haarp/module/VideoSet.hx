@@ -95,6 +95,7 @@ class VideoSet extends Module {
     override function render() {
         var ctx = vision.display.getContext2d();
         ctx.save();
+        //ctx.globalCompositeOperation = 'screen';
         ctx.scale( vision.display.width / video.videoWidth, vision.display.height / video.videoHeight );
         ctx.drawImage( video, 0, 0 );
         ctx.restore();

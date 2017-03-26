@@ -33,8 +33,6 @@ class HMDClient {
 
     public function connect() : Promise<Dynamic> {
 
-        trace( 'Connecting to HMD host ...' );
-
         return new Promise( function(resolve,reject){
 
             var url = 'ws://$ip:$port';
@@ -43,13 +41,19 @@ class HMDClient {
                 sendSocketMessage( {
                     type: 'init',
                     size: {
-                        width: Std.int( window.innerWidth / 2 ),
-                        height: Std.int( window.innerHeight )
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                        //width: Std.int( window.innerWidth / 2 ),
+                        //height: Std.int( window.innerHeight )
                     }
                 } );
             });
-            socket.addEventListener( 'error', function(e) trace(e) );
-            socket.addEventListener( 'close', function(e) trace(e) );
+            socket.addEventListener( 'error', function(e) {
+                //reject( e );
+            });
+            socket.addEventListener( 'close', function(e) {
+                reject(e);
+            });
             socket.addEventListener( 'message', function(e) {
 
                 var msg : Dynamic = try Json.parse( e.data ) catch(e:Dynamic) {
@@ -57,7 +61,7 @@ class HMDClient {
                     return;
                 }
 
-                //trace(msg);
+                trace(msg);
 
                 switch msg.type {
 
@@ -66,7 +70,7 @@ class HMDClient {
                     peer = new PeerConnection();
 
                     peer.onicecandidate = function(e) {
-                        //trace(e);
+                        //trace(e );
                         /*
                         if( e.candidate != null ) {
                             sendMessage( { type: 'ice', candidate: e.candidate } );
@@ -82,10 +86,9 @@ class HMDClient {
                     }
 
                     peer.ondatachannel = function(e) {
-                        trace(e);
                         channel = e.channel;
                         channel.onopen = function(e) {
-                            trace(e);
+                            trace( 'Data Channel Open' );
                             resolve( {} );
                         }
                         channel.onclose = function(e) trace(e);
@@ -99,7 +102,7 @@ class HMDClient {
                         peer.createAnswer().then( function(desc){
                             peer.setLocalDescription( desc ).then( function(_){
                                 sendSocketMessage( { type: 'sdp', sdp: desc } );
-                                trace( " CONECTED" );
+                                trace( "..." );
                                 //replace( new VisionActivity( socket, stream ) );
                             });
                         });

@@ -16,13 +16,18 @@
 -lib om.app
 -lib om.audio
 -lib om.net
-#-lib om.three
+-lib om.three
 -lib om.tween
 -lib hxnodejs-serialport
+-lib pixijs
 #-D app_name=haarp
 #-D app_version=0.3.0
 #-D web
 #-D HEAD1B
+#--macro include('res/script/three.min.js')
+#-D three_include_js
+#-cmd mkdir -p res/script/three.min.js bin/script/
+#-cmd cp res/script/three.min.js bin/script/
 
 #--next
 #-js bin/app.js

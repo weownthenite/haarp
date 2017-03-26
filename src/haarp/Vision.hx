@@ -118,7 +118,7 @@ class Vision {
 
     public function render() {
         if( state == Play ) {
-            if( display.autoClear ) display.clear();
+            //if( display.autoClear ) display.clear();
             for( m in modules ) {
                 if( m.enabled ) m.render();
             }

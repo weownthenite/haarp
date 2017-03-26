@@ -13,6 +13,8 @@ import haarp.display.CompositeOperation;
 
 class Display {
 
+    public var canvas(default,null) : CanvasElement;
+
     public var width(get,set) : Int;
     inline function get_width() return canvas.width;
     inline function set_width(v:Int) return canvas.width = v;
@@ -33,9 +35,12 @@ class Display {
     inline function get_imageSmoothingEnabled() return context.imageSmoothingEnabled;
     inline function set_imageSmoothingEnabled(v:Bool) return context.imageSmoothingEnabled = v;
 
-    public var autoClear = true;
+    public var transform(get,set) : String;
+    inline function get_transform() return canvas.style.transform;
+    inline function set_transform(v:String) return canvas.style.transform = v;
 
-    public var canvas(default,null) : CanvasElement;
+
+    public var autoClear = true;
 
     var context : CanvasRenderingContext2D;
     //var layers : Array<Layer>;
