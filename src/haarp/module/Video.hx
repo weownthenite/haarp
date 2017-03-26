@@ -28,7 +28,7 @@ class Video extends DisplayModule {
 
     override function init() {
 
-        super.init();
+        //super.init();
 
         return new Promise( function(resolve,reject){
 

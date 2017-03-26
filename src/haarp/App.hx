@@ -10,10 +10,11 @@ class App implements om.App {
     public static inline var RES = '/home/tong/dev/HAARP';
     public static inline var WEB = 'http://localhost/HAARP';
 
+    static var animationFrameId : Int;
     static var vision : Vision;
 
     static function update( time : Float ) {
-        window.requestAnimationFrame( update );
+        animationFrameId = window.requestAnimationFrame( update );
         vision.update();
         vision.render();
     }
@@ -40,12 +41,13 @@ class App implements om.App {
 
             trace( 'Vision Ready' );
 
-            window.requestAnimationFrame( update );
+            animationFrameId = window.requestAnimationFrame( update );
 
-            vision.onEnd = function() {
+            vision.onDispose = function() {
                 console.info( 'Vision End' );
+                window.cancelAnimationFrame( animationFrameId );
             }
-            //vision.start();
+            vision.start();
 
             document.body.onmousedown  = function(e) {
                 switch e.which {

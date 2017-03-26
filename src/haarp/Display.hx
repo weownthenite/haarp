@@ -5,6 +5,7 @@ import js.Browser.window;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
 import js.html.ImageBitmap;
+import js.html.ImageData;
 import js.html.Path2D;
 import haarp.display.CompositeOperation;
 
@@ -34,7 +35,8 @@ class Display {
 
     public var autoClear = true;
 
-    var canvas : CanvasElement;
+    public var canvas(default,null) : CanvasElement;
+
     var context : CanvasRenderingContext2D;
     //var layers : Array<Layer>;
 
@@ -63,8 +65,8 @@ class Display {
         context.clip( path );
     }
 
-    public inline function draw( bmp : ImageBitmap ) {
-        context.drawImage( bmp, 0, 0 );
+    public inline function draw( bmp : ImageBitmap, x = 0, y = 0 ) {
+        context.drawImage( bmp, x, y);
     }
 
     public function fitCanvas() {

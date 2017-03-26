@@ -22,7 +22,7 @@ private enum State {
 @:access(haarp.Module)
 class Vision {
 
-    public dynamic function onEnd() {}
+    public dynamic function onDispose() {}
 
     public var name(default,null) : String;
     public var state(default,null) : State;
@@ -104,8 +104,10 @@ class Vision {
 
     public function update() {
 
+        //switch state {
+        //case Play,Pause:
         var now = Time.now();
-        time = (now - timeStart - timePauseOffset);
+        time = (now - timeStart - timePauseOffset) / 1000;
 
         audio.update();
 
@@ -115,7 +117,6 @@ class Vision {
     }
 
     public function render() {
-    //    if( started ) {
         if( state == Play ) {
             if( display.autoClear ) display.clear();
             for( m in modules ) {
@@ -134,6 +135,8 @@ class Vision {
 
         display.clear();
         display.dispose();
+
+        onDispose();
     }
 
 }
