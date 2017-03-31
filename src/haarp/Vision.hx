@@ -31,6 +31,8 @@ class Vision {
     public var audio(default,null) : Audio;
     public var display(default,null) : Display;
 
+    //var volume : Float;
+
     var timeStart : Float;
     var timePauseStart : Float;
     var timePauseOffset : Float;
@@ -62,9 +64,13 @@ class Vision {
         modules.push( module );
     }
 
+    public function remove( module : Module ) {
+        modules.remove( module );
+    }
+
     public function start() {
 
-        console.log( 'Vision start' );
+        console.log( 'Vision Start' );
 
         state = Play;
         timeStart = Time.now();
@@ -118,7 +124,7 @@ class Vision {
 
     public function render() {
         if( state == Play ) {
-            //if( display.autoClear ) display.clear();
+            if( display.autoClear ) display.clear();
             for( m in modules ) {
                 if( m.enabled ) m.render();
             }

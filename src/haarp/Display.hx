@@ -29,16 +29,15 @@ class Display {
 
     public var compositeOperation(get,set) : CompositeOperation;
     inline function get_compositeOperation() return context.globalCompositeOperation;
-    inline function set_compositeOperation(v:String) return context.globalCompositeOperation = v;
+    inline function set_compositeOperation(v:CompositeOperation) return context.globalCompositeOperation = v;
 
     public var imageSmoothingEnabled(get,set) : Bool;
     inline function get_imageSmoothingEnabled() return context.imageSmoothingEnabled;
     inline function set_imageSmoothingEnabled(v:Bool) return context.imageSmoothingEnabled = v;
 
-    public var transform(get,set) : String;
-    inline function get_transform() return canvas.style.transform;
-    inline function set_transform(v:String) return canvas.style.transform = v;
-
+    //public var transform(get,set) : String;
+    //inline function get_transform() return canvas.style.transform;
+    //inline function set_transform(v:String) return canvas.style.transform = v;
 
     public var autoClear = true;
 

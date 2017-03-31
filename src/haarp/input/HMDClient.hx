@@ -16,8 +16,11 @@ import js.html.rtc.SessionDescription;
 
 class HMDClient {
 
+    public dynamic function onDisconnect() {}
     public dynamic function onMessage( msg : Dynamic ) {}
     public dynamic function onStream( stream : MediaStream ) {}
+
+    public var connected(default,null) : Bool;
 
     var ip : String;
     var port : Int;
@@ -29,6 +32,7 @@ class HMDClient {
     public function new( ip : String, port : Int ) {
         this.ip = ip;
         this.port = port;
+        connected = false;
     }
 
     public function connect() : Promise<Dynamic> {
@@ -49,10 +53,13 @@ class HMDClient {
                 } );
             });
             socket.addEventListener( 'error', function(e) {
+                connected = false;
                 //reject( e );
             });
             socket.addEventListener( 'close', function(e) {
+                connected = false;
                 reject(e);
+                onDisconnect();
             });
             socket.addEventListener( 'message', function(e) {
 
@@ -89,6 +96,7 @@ class HMDClient {
                         channel = e.channel;
                         channel.onopen = function(e) {
                             trace( 'Data Channel Open' );
+                            connected = true;
                             resolve( {} );
                         }
                         channel.onclose = function(e) trace(e);

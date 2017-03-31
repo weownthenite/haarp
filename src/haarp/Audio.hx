@@ -51,11 +51,11 @@ class Audio {
         return AudioBufferLoader.loadAudioBuffer( context, url );
     }
 
-    /*
+
     public inline function connect( node : AudioNode ) {
         node.connect( gain );
     }
-    */
+    
 
     public function update() {
         analyser.getByteFrequencyData( frequencyData );

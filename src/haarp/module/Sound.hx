@@ -9,6 +9,8 @@ import om.audio.AudioBufferLoader;
 
 class Sound extends Module {
 
+    static inline var LEGE_ARTIS_INTRO_DELAY = 60 * 25;
+
     public var path(default,null) : String;
     public var startOffset(default,null) : Float;
     public var loop : Bool;
@@ -49,16 +51,19 @@ class Sound extends Module {
 
         if( timePauseStart > 0 ) {
             timeStart = Time.now() - timePauseStart;
-            source.start( 0, timePauseStart / 1000 );
+            //trace( startOffset + timePauseStart / 1000);
+            source.start( 0, startOffset + timePauseStart / 1000 + LEGE_ARTIS_INTRO_DELAY );
         } else {
             timeStart = Time.now();
-            source.start();
+            source.start( startOffset + LEGE_ARTIS_INTRO_DELAY );
         }
     }
 
     override function stop() {
-        source.onended = null;
-        source.stop();
+        if( source != null ) {
+            source.onended = null;
+            source.stop();
+        }
     }
 
     override function pause() {

@@ -9,6 +9,8 @@ class App implements om.App {
     public static inline var RES = '/home/tong/dev/HAARP';
     public static inline var WEB = 'http://localhost/HAARP';
 
+    public static var ip(default,null) : String;
+
     static var animationFrameId : Int;
     static var vision : Vision;
 
@@ -30,6 +32,9 @@ class App implements om.App {
         var name = window.location.search.substr( 1 );
         console.info( name);
 
+        ip = om.Network.getLocalIP()[0];
+        console.log( 'IP: $ip' );
+
         #if HEAD1B
         vision = new haarp.vision.HEAD1B( '$RES/video/danzig' );
         #else
@@ -46,7 +51,7 @@ class App implements om.App {
                 console.info( 'Vision End' );
                 window.cancelAnimationFrame( animationFrameId );
             }
-            vision.start();
+            //vision.start();
 
             document.body.onmousedown  = function(e) {
                 switch e.which {
