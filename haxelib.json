@@ -1,0 +1,14 @@
+{
+    "name": "haarp",
+    "version": "0.3.0",
+    "description": "Mind bender",
+    "tags": ["haarp"],
+    "url": "https://github.com/tong/haarp",
+    "license": "OM",
+    "contributors": ["tong"],
+    "releasenote": "See CHANGELOG.md",
+    "classPath" : "src/",
+    "dependencies": {
+        "electron": ""
+    }
+}
